@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text.Json.Serialization;
 using CoreEssentials.Utils;
 
@@ -59,13 +60,14 @@ namespace CoreEssentials.Result
                 {
                     reconstructedException = ReflectionUtils.CreateInstance<Exception>(type, Message!, inner!);
                 }
-                catch (MissingMethodException)
+                //add or AmbiguousMatchException
+                catch (SystemException)
                 {
                     try 
                     { 
                         reconstructedException = ReflectionUtils.CreateInstance<Exception>(type, Message!);
                     }
-                    catch (MissingMethodException)
+                    catch (SystemException)
                     {
                         try 
                         { 
