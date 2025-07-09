@@ -32,14 +32,37 @@ namespace CoreEssentials.Http
         {
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadFromJsonAsync<TSuccess>(options, cancellationToken);
+                var content = response.HasContent()
+                        ? await response.Content.ReadFromJsonAsync<TSuccess>(options, cancellationToken)
+                        : default;
                 return content ?? default!;
             }
             else
             {
-                var content = await response.Content.ReadFromJsonAsync<TError>(options, cancellationToken);
+                var content = response.HasContent()
+                        ? await response.Content.ReadFromJsonAsync<TError>(options, cancellationToken)
+                        : default;
                 return content ?? default!;
             }
+        }
+
+        /// <summary>
+        /// Determines whether the HTTP response message contains content.
+        /// </summary>
+        /// <param name="response">The <see cref="HttpResponseMessage"/> to check for content.</param>
+        /// <returns><see langword="true"/> if the response contains content; otherwise, <see langword="false"/>.</returns>
+        private static bool HasContent(this HttpResponseMessage response)
+        {
+            if (response?.Content == null)
+                return false;
+
+            // If ContentLength is explicitly set and is greater than 0, we have content
+            if (response.Content.Headers.ContentLength.HasValue)
+                return response.Content.Headers.ContentLength.Value > 0;
+
+            // If ContentLength is not set, we assume there might be content
+            // This handles cases like chunked transfer encoding
+            return true;
         }
     }
 }
