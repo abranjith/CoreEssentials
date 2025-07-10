@@ -16,9 +16,9 @@ A comprehensive .NET library providing essential utilities and patterns for robu
 
 ### Overview
 
-The `Result` namespace provides a robust implementation of the Result pattern, a functional programming concept that offers an elegant alternative to traditional exception-based error handling. This pattern enables you to write more predictable, composable, and maintainable code by making errors explicit in your method signatures.
+`Result` API provides a robust implementation of the Result pattern, a functional programming concept that offers an elegant alternative to traditional exception-based error handling. This pattern enables you to write more predictable, composable, and maintainable code by making errors explicit in your method signatures.
 
-The Result pattern is inspired by similar implementations in languages like Rust, F#, and Haskell, bringing functional error handling paradigms to the .NET ecosystem. Instead of throwing exceptions or returning null values, operations return a `Result<TResult, TError>` that explicitly represents either success or failure.
+The Result pattern is inspired by similar implementations in languages like Rust bringing functional error handling paradigms to the .NET ecosystem. Instead of throwing exceptions or returning null values, operations return a `Result<TResult, TError>` that explicitly represents either success or failure.
 
 
 ### Key Features
@@ -51,15 +51,15 @@ Result<int, string> result2 = "Error";      // Error
 **Exception Analysis**
 - `IsCausedBy<T>()` - Checks if error is caused by specific exception type
 - Supports inheritance checking (derived exceptions match base types)
-- Works with serialized exceptions across application boundaries
+- Note that any Exception captured within Result object can be serialized unlike certian Exception types
 
 #### Transformation Operations
 
 **Value Mapping**
 - `Map<TUResult>(mapFunc)` - Transform success value to new type
 - `MapAsync<TUResult>(mapFunc, cancellationToken)` - Async value transformation
-- `MapOr<TUResult>(mapFunc, defaultValue)` - Transform with fallback
-- `MapOrAsync<TUResult>(mapFunc, defaultValue, cancellationToken)` - Async transform with fallback
+- `MapOr<TUResult>(mapFunc, defaultValue)` - Transform with default if error
+- `MapOrAsync<TUResult>(mapFunc, defaultValue, cancellationToken)` - Async transform with default if error
 
 **Error Mapping**
 - `MapErr<TUError>(mapFunc)` - Transform error to new type
@@ -190,33 +190,19 @@ public Result<ProcessedData, BusinessError> ProcessData(RawData data)
 }
 ```
 
-### Extension Methods
-
-The `ResultExtensions` class provides a rich set of extension methods for working with Result types:
-
-#### Mapping Extensions
-- **Map/MapAsync** - Transform success values
-- **MapErr/MapErrAsync** - Transform error values  
-- **MapOr/MapOrAsync** - Transform with fallback values
-- **MapOrElse/MapOrElseAsync** - Transform both success and error cases
-
-#### Conditional Extensions
-- **IsOkAnd/IsOkAndAsync** - Execute actions on success
-- **IsErrAnd/IsErrAndAsync** - Execute actions on error
-
 All async methods support `CancellationToken` for proper cancellation handling in async scenarios.
 
-### HTTP Integration
+### HTTP Result
 
-The library includes HTTP integration through `HttpResponseMessageExtensions`:
+Since HTTP calls are everywhere, this library includes HTTP extension method to convert `HttpResponseMessage` to Result object with success type & error type :
 
 ```csharp
 using CoreEssentials.Http;
 
-public async Task<Result<UserResponse, ErrorResponse>> GetUser(int id)
+public async Task<Result<UserResponse, ErrorResponse>> GetUser(int id, CancellationToken ct)
 {
     var response = await httpClient.GetAsync($"/api/users/{id}");
-    return await response.AsResult<UserResponse, ErrorResponse>();
+    return await response.AsResult<UserResponse, ErrorResponse>(cancellationToken: ct);
 }
 
 // Usage
@@ -225,7 +211,7 @@ userResult.IsOkAnd(user => Console.WriteLine($"User: {user.Name}"));
 userResult.IsErrAnd(error => Console.WriteLine($"Error: {error.Message}"));
 ```
 
-The `AsResult` extension automatically deserializes successful responses to the success type and error responses to the error type based on the HTTP status code.
+The `AsResult` extension automatically deserializes successful responses to the success type and error responses to the error type based on the HTTP status code. Note there is also support for custom `JsonSerializerOptions`.
 
 ---
 
