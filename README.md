@@ -12,13 +12,13 @@ A comprehensive .NET library providing essential utilities and patterns for robu
   - [Extension Methods](#extension-methods)
   - [HTTP Result](#http-integration)
 
-## CoreEssentials.Result
+## Result
 
 ### Overview
 
-`Result` API provides a robust implementation of the Result pattern, a functional programming concept that offers an elegant alternative to traditional exception-based error handling. This pattern enables you to write more predictable, composable, and maintainable code by making errors explicit in your method signatures.
+`Result` API provides a robust implementation of the Result pattern that offers an elegant alternative to traditional exception-based error handling. This pattern enables you to write more predictable, composable, and maintainable code by making errors explicit in your method signatures.
 
-The Result pattern is inspired by similar implementations in languages like Rust bringing functional error handling paradigms to the .NET ecosystem. Instead of throwing exceptions or returning null values, operations return a `Result<TResult, TError>` that explicitly represents either success or failure.
+The Result pattern is inspired by similar implementations in languages like Rust. Instead of throwing exceptions or returning null values, operations return a `Result<TResult, TError>` that explicitly represents either success or failure.
 
 
 ### Key Features
