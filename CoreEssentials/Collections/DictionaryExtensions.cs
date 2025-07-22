@@ -1,6 +1,8 @@
-﻿using System;
+﻿using CoreEssentials.Common;
+using CoreEssentials.Enumerable;
+using System;
 using System.Collections.Generic;
-using System.Text;
+
 
 namespace CoreEssentials.Collections
 {
@@ -33,7 +35,7 @@ namespace CoreEssentials.Collections
 
             foreach (var kvp in dictionary)
             {
-                if (kvp.Key != null && StringEquals(kvp.Key, key, compareFlags))
+                if (kvp.Key != null && kvp.Key.Equals(key, compareFlags))
                 {
                     value = kvp.Value;
                     return true;
@@ -50,10 +52,10 @@ namespace CoreEssentials.Collections
         /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
         /// <param name="dictionary">The dictionary to search.</param>
         /// <param name="key">The key to locate.</param>
-        /// <param name="defaultValue">The default value to return if the key is not found.</param>
         /// <param name="compareFlags">The flags that specify how the comparison should be performed.</param>
+        /// <param name="defaultValue">The default value to return if the key is not found.</param>
         /// <returns>The value associated with the specified key, or the default value if the key is not found.</returns>
-        public static TValue GetValueOrDefault<TValue>(this IDictionary<string, TValue> dictionary, string key, TValue defaultValue = default!, CompareFlags compareFlags = CompareFlags.None)
+        public static TValue GetValueOrDefault<TValue>(this IDictionary<string, TValue> dictionary, string key, CompareFlags compareFlags = CompareFlags.None, TValue defaultValue = default!)
         {
             if (dictionary == null)
                 throw new ArgumentNullException(nameof(dictionary));
@@ -61,50 +63,36 @@ namespace CoreEssentials.Collections
             return dictionary.TryGetValue(key, out TValue value, compareFlags) ? value : defaultValue;
         }
 
-        private static bool StringEquals(string str1, string str2, CompareFlags compareFlags)
+        /// <summary>
+        /// Retrieves the value associated with the specified key from the dictionary,  or returns a default value if
+        /// the key is not found.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <param name="dictionary">The dictionary to search for the key. Cannot be null.</param>
+        /// <param name="key">The key to locate in the dictionary.</param>
+        /// <param name="keyProcessor">A function to process the key before searching the dictionary.</param>
+        /// <param name="defaultValue">The value to return if the key is not found. Defaults to the default value of <typeparamref name="TValue"/>.</param>
+        /// <returns>The value associated with the processed key if found; otherwise, <paramref name="defaultValue"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="dictionary"/> is null.</exception>
+        public static TValue GetValueOrDefault<TValue>(this IDictionary<string, TValue> dictionary, string key, Func<string, string> keyProcessor, TValue defaultValue = default!)
         {
-            string processedStr1 = ProcessStringWithFlags(str1, compareFlags);
-            string processedStr2 = ProcessStringWithFlags(str2, compareFlags);
+            if (dictionary == null)
+                throw new ArgumentNullException(nameof(dictionary));
 
-            return processedStr1.Equals(processedStr2, 
-                compareFlags.HasFlag(CompareFlags.IgnoreCase) ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture);
-        }
-
-        private static string ProcessStringWithFlags(string input, CompareFlags compareFlags)
-        {
-            string result = input;
-
-            if (compareFlags.HasFlag(CompareFlags.IgnoreWhitespace))
+            if (key == null)
             {
-                var sb = new StringBuilder();
-                foreach (char c in result)
-                {
-                    if (!char.IsWhiteSpace(c))
-                        sb.Append(c);
-                }
-                result = sb.ToString();
+                return defaultValue;
             }
 
-            return result;
+            foreach (var kvp in dictionary)
+            {
+                if (kvp.Key != null && kvp.Key.Equals(key, keyProcessor!))
+                {
+                    return kvp.Value;
+                }
+            }
+
+            return defaultValue;
         }
-    }
-
-    [Flags]
-    public enum CompareFlags
-    {
-        /// <summary>
-        /// No additional flags.
-        /// </summary>
-        None = 0,
-        
-        /// <summary>
-        /// Specifies that the comparison should ignore case differences (current culture).
-        /// </summary>
-        IgnoreCase = 1 << 0,
-
-        /// <summary>
-        /// Specifies that the comparison should ignore any whit space differences.
-        /// </summary>
-        IgnoreWhitespace = 1 << 1,
     }
 }
