@@ -98,5 +98,59 @@ namespace CoreEssentials.Tests.Enumerable
         }
 
         #endregion
+
+        #region Equals with CompareAlphabets and CompareNumbers
+
+        [Fact]
+        public void Equals_WithCompareAlphabets_OnlyAlphabetsCompared()
+        {
+            Assert.True("abc123".Equals("abc", CompareFlags.CompareAlphabets));
+            Assert.True("a b c 1 2 3".Equals("abc", CompareFlags.CompareAlphabets | CompareFlags.IgnoreWhitespace));
+            Assert.False("abc123".Equals("abd", CompareFlags.CompareAlphabets));
+        }
+
+        [Fact]
+        public void Equals_WithCompareNumbers_OnlyNumbersCompared()
+        {
+            Assert.True("abc123".Equals("123", CompareFlags.CompareNumbers));
+            Assert.True("a1b2c3".Equals("123", CompareFlags.CompareNumbers));
+            Assert.False("abc123".Equals("124", CompareFlags.CompareNumbers));
+        }
+
+        [Fact]
+        public void Equals_WithCompareAlphabetsAndIgnoreCase_AlphabetsCaseInsensitive()
+        {
+            Assert.True("AbC123".Equals("aBc", CompareFlags.CompareAlphabets | CompareFlags.IgnoreCase));
+        }
+
+        [Fact]
+        public void Equals_WithCompareNumbersAndIgnoreWhitespace_NumbersWhitespaceIgnored()
+        {
+            Assert.True("1 2 3".Equals("123", CompareFlags.CompareNumbers | CompareFlags.IgnoreWhitespace));
+        }
+
+        [Fact]
+        public void Equals_WithCompareAlphabetsAndNumbers_AlphabetsAndNumbersCompared()
+        {
+            Assert.True("abc123".Equals("abc123", CompareFlags.CompareAlphabets | CompareFlags.CompareNumbers));
+            Assert.False("a1b2c3".Equals("abc123", CompareFlags.CompareAlphabets | CompareFlags.CompareNumbers));
+            Assert.False("abc123".Equals("abd123", CompareFlags.CompareAlphabets | CompareFlags.CompareNumbers));
+            Assert.False("abc123".Equals("abc124", CompareFlags.CompareAlphabets | CompareFlags.CompareNumbers));
+        }
+
+        [Fact]
+        public void Equals_WithCompareAlphabetsNumbersAndIgnoreCase_AllFlagsCombined()
+        {
+            Assert.True("A1B2C3".Equals("a1b2c3", CompareFlags.CompareAlphabets | CompareFlags.CompareNumbers | CompareFlags.IgnoreCase));
+            Assert.True("A 1 B 2 C 3".Equals("a1b2c3", CompareFlags.CompareAlphabets | CompareFlags.CompareNumbers | CompareFlags.IgnoreCase | CompareFlags.IgnoreWhitespace));
+        }
+
+        [Fact]
+        public void Equals_WithCompareAlphabetsNumbersAndWhitespace_NonAlphaNumIgnored()
+        {
+            Assert.True("a!1@b#2$c%3".Equals("a1b2c3", CompareFlags.CompareAlphabets | CompareFlags.CompareNumbers));
+        }
+
+        #endregion
     }
 }

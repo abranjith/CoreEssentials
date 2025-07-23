@@ -20,5 +20,16 @@ namespace CoreEssentials.Common
         /// Specifies that the comparison should ignore any whit space differences.
         /// </summary>
         IgnoreWhitespace = 1 << 1,
+
+        
+        /// <summary>
+        /// Specifies that the comparison should consider only alphabetic characters.
+        /// </summary>
+        CompareAlphabets = 1 << 2,
+
+        /// <summary>
+        /// Compares only the numeric parts of the strings.
+        /// </summary>
+        CompareNumbers = 1 << 3,
     }
 }

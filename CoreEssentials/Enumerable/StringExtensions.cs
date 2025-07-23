@@ -54,25 +54,45 @@ namespace CoreEssentials.Enumerable
             return (processedStr1?.Equals(processedStr2) == true);
         }
 
+        //TODO simplify logic here
         private static string? ProcessStringWithFlags(string? input, CompareFlags compareFlags)
         {
             if(input == null)
                 return null;
 
             string result = input;
-
-            if (compareFlags.HasFlag(CompareFlags.IgnoreWhitespace))
+            var sb = new StringBuilder();
+            foreach (char c in result)
             {
-                var sb = new StringBuilder();
-                foreach (char c in result)
+                if (compareFlags.HasFlag(CompareFlags.IgnoreWhitespace))
                 {
-                    if (!char.IsWhiteSpace(c))
-                        sb.Append(c);
+                    if (char.IsWhiteSpace(c)) continue;
                 }
-                result = sb.ToString();
+                if (compareFlags.HasFlag(CompareFlags.CompareAlphabets))
+                {
+                    if (compareFlags.HasFlag(CompareFlags.CompareNumbers))
+                    {
+                        if (!char.IsDigit(c) && !c.IsEnglishLetter()) continue;
+                    }
+                    else
+                    {
+                        if (!c.IsEnglishLetter()) continue;
+                    }
+                }
+                if (compareFlags.HasFlag(CompareFlags.CompareNumbers) && !compareFlags.HasFlag(CompareFlags.CompareAlphabets))
+                {
+                    if (!char.IsDigit(c)) continue;
+                }
+                sb.Append(c);
             }
+            result = sb.ToString();
 
             return result;
+        }
+
+        private static bool IsEnglishLetter(this char c)
+        {
+            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
         }
     }
 }
