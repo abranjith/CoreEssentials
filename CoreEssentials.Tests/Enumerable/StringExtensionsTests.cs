@@ -152,5 +152,113 @@ namespace CoreEssentials.Tests.Enumerable
         }
 
         #endregion
+
+        #region ToCamelCase and ToPascalCase Tests
+
+        [Theory]
+        [InlineData("hello world", "helloWorld")]
+        [InlineData("HELLO WORLD", "helloWorld")]
+        [InlineData("Hello World", "helloWorld")]
+        [InlineData("hello_world", "helloWorld")]
+        [InlineData("hello-world", "helloWorld")]
+        [InlineData("helloWorld", "helloworld")]
+        [InlineData("HelloWorld", "helloworld")]
+        [InlineData("", "")]
+        [InlineData(null, null)]
+        [InlineData("   spaced   words   ", "spacedWords")]
+        [InlineData("multiple   spaces   between", "multipleSpacesBetween")]
+        [InlineData("mixed_separators-in one_string", "mixedSeparatorsInOneString")]
+        public void ToCamelCase_WithVariousInputs_ReturnsCamelCasedString(string input, string expected)
+        {
+            // Act
+            string result = input.ToCamelCase();
+            
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("hello world", "HelloWorld")]
+        [InlineData("HELLO WORLD", "HelloWorld")]
+        [InlineData("Hello World", "HelloWorld")]
+        [InlineData("hello_world", "HelloWorld")]
+        [InlineData("hello-world", "HelloWorld")]
+        [InlineData("helloWorld", "Helloworld")]
+        [InlineData("HelloWorld", "Helloworld")]
+        [InlineData("", "")]
+        [InlineData(null, null)]
+        [InlineData("   spaced   words   ", "SpacedWords")]
+        [InlineData("multiple   spaces   between", "MultipleSpacesBetween")]
+        [InlineData("mixed_separators-in one_string", "MixedSeparatorsInOneString")]
+        public void ToPascalCase_WithVariousInputs_ReturnsPascalCasedString(string input, string expected)
+        {
+            // Act
+            string result = input.ToPascalCase();
+            
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("a", "a")]
+        [InlineData("A", "a")]
+        [InlineData("1", "1")]
+        [InlineData("_", "")]
+        [InlineData("-", "")]
+        [InlineData(" ", "")]
+        public void ToCamelCase_WithSingleCharInputs_HandlesEdgeCases(string input, string expected)
+        {
+            // Act
+            string result = input.ToCamelCase();
+            
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("a", "A")]
+        [InlineData("A", "A")]
+        [InlineData("1", "1")]
+        [InlineData("_", "")]
+        [InlineData("-", "")]
+        [InlineData(" ", "")]
+        public void ToPascalCase_WithSingleCharInputs_HandlesEdgeCases(string input, string expected)
+        {
+            // Act
+            string result = input.ToPascalCase();
+            
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void ToCamelCase_WithComplexString_ReturnsCamelCaseString()
+        {
+            // Arrange
+            string input = "This_is-a complex   string WITH_mixed Separators123";
+            string expected = "thisIsAComplexStringWithMixedSeparators123";
+            
+            // Act
+            string result = input.ToCamelCase();
+            
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void ToPascalCase_WithComplexString_ReturnsPascalCaseString()
+        {
+            // Arrange
+            string input = "This_is-a complex   string WITH_mixed Separators123";
+            string expected = "ThisIsAComplexStringWithMixedSeparators123";
+            
+            // Act
+            string result = input.ToPascalCase();
+            
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        #endregion
     }
 }

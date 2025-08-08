@@ -90,9 +90,80 @@ namespace CoreEssentials.Enumerable
             return result;
         }
 
+        /// <summary>
+        /// Convert a string to PascalCase.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToPascalCase(this string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
+            var sb = new StringBuilder();
+            bool capitalizeNext = true;
+            foreach (char c in str)
+            {
+                if (char.IsWhiteSpace(c) || c == '_' || c == '-')
+                {
+                    capitalizeNext = true;
+                }
+                else
+                {
+                    if (capitalizeNext)
+                    {
+                        sb.Append(char.ToUpper(c));
+                        capitalizeNext = false;
+                    }
+                    else
+                    {
+                        sb.Append(char.ToLower(c));
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Convert a string to camelCase.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToCamelCase(this string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
+            var sb = new StringBuilder();
+            bool capitalizeNext = true;
+            foreach (char c in str)
+            {
+                if (char.IsWhiteSpace(c) || c == '_' || c == '-')
+                {
+                    capitalizeNext = true;
+                }
+                else
+                {
+                    if (capitalizeNext)
+                    {
+                        var c2 = sb.Length == 0 ? char.ToLower(c) : char.ToUpper(c);
+                        sb.Append(c2);
+                        capitalizeNext = false;
+                    }
+                    else
+                    {
+                        sb.Append(char.ToLower(c));
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+
+        #region :: Helper Methods ::
+
         private static bool IsEnglishLetter(this char c)
         {
             return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
         }
+
+        #endregion
     }
 }
