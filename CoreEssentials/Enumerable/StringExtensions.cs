@@ -157,7 +157,87 @@ namespace CoreEssentials.Enumerable
             return sb.ToString();
         }
 
+
+        /// <summary>
+        /// Pads the input string with random characters up to the specified length based on the provided PadOptions.
+        /// </summary>
+        /// <param name="input">The input string to pad.</param>
+        /// <param name="targetLength">The target length of the resulting string.</param>
+        /// <param name="padOptions">The options specifying which types of characters to use for padding.</param>
+        /// <returns>A string padded to the specified length with random characters based on the PadOptions.</returns>
+        public static string PadChars(this string input, int targetLength, PadOptions padOptions)
+        {
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
+            
+            if (targetLength <= input.Length)
+                return input;
+                
+            if (padOptions == PadOptions.None)
+                return input;
+
+            var random = new Random();
+            var sb = new StringBuilder(input);
+            var paddingChars = GetPaddingCharacters(padOptions);
+            
+            if (paddingChars.Length == 0)
+                return input;
+
+            int charsToAdd = targetLength - input.Length;
+            for (int i = 0; i < charsToAdd; i++)
+            {
+                char randomChar = paddingChars[random.Next(paddingChars.Length)];
+                sb.Append(randomChar);
+            }
+
+            return sb.ToString();
+        }
+
         #region :: Helper Methods ::
+
+        private static char[] GetPaddingCharacters(PadOptions padOptions)
+        {
+            var chars = new StringBuilder();
+            
+            if (padOptions.HasFlag(PadOptions.Numbers))
+            {
+                for (char c = '0'; c <= '9'; c++)
+                {
+                    chars.Append(c);
+                }
+            }
+            
+            if (padOptions.HasFlag(PadOptions.LowerCaseAlphabets))
+            {
+                for (char c = 'a'; c <= 'z'; c++)
+                {
+                    chars.Append(c);
+                }
+            }
+            if (padOptions.HasFlag(PadOptions.UpperCaseAlphabets))
+            {
+                for (char c = 'A'; c <= 'Z'; c++)
+                {
+                    chars.Append(c);
+                }
+            }
+
+            if (padOptions.HasFlag(PadOptions.Whitespace))
+            {
+                chars.Append(' ');
+                chars.Append('\t');
+                chars.Append('\n');
+                chars.Append('\r');
+            }
+            
+            if (padOptions.HasFlag(PadOptions.SpecialCharacters))
+            {
+                string specialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
+                chars.Append(specialChars);
+            }
+            
+            return chars.ToString().ToCharArray();
+        }
 
         private static bool IsEnglishLetter(this char c)
         {

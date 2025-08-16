@@ -260,5 +260,380 @@ namespace CoreEssentials.Tests.Enumerable
         }
 
         #endregion
+
+        #region PadChars Method Tests
+
+        [Fact]
+        public void PadChars_WithNullInput_ThrowsArgumentNullException()
+        {
+            // Arrange
+            string? input = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => input!.PadChars(10, PadOptions.Numbers));
+        }
+
+        [Fact]
+        public void PadChars_WithTargetLengthSmallerThanInputLength_ReturnsOriginalString()
+        {
+            // Arrange
+            string input = "hello world";
+            int targetLength = 5;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(input, result);
+        }
+
+        [Fact]
+        public void PadChars_WithTargetLengthEqualToInputLength_ReturnsOriginalString()
+        {
+            // Arrange
+            string input = "hello";
+            int targetLength = 5;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(input, result);
+            Assert.Equal(targetLength, result.Length);
+        }
+
+        [Fact]
+        public void PadChars_WithPadOptionsNone_ReturnsOriginalStringRegardlessOfTargetLength()
+        {
+            // Arrange
+            string input = "test";
+            int targetLength = 10;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.None);
+
+            // Assert
+            Assert.Equal(input, result);
+            Assert.Equal(input.Length, result.Length);
+        }
+
+        [Fact]
+        public void PadChars_WithNumbersPadOption_PadsWithDigitsOnly()
+        {
+            // Arrange
+            string input = "abc";
+            int targetLength = 8;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are digits
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsDigit(c)));
+        }
+
+        [Fact]
+        public void PadChars_WithLowerCaseAlphabetsPadOption_PadsWithLowercaseLettersOnly()
+        {
+            // Arrange
+            string input = "123";
+            int targetLength = 10;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.LowerCaseAlphabets);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are lowercase letters
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsLower(c) && char.IsLetter(c)));
+        }
+
+        [Fact]
+        public void PadChars_WithUpperCaseAlphabetsPadOption_PadsWithUppercaseLettersOnly()
+        {
+            // Arrange
+            string input = "xyz";
+            int targetLength = 12;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.UpperCaseAlphabets);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are uppercase letters
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsUpper(c) && char.IsLetter(c)));
+        }
+
+        [Fact]
+        public void PadChars_WithWhitespacePadOption_PadsWithWhitespaceCharactersOnly()
+        {
+            // Arrange
+            string input = "test";
+            int targetLength = 15;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Whitespace);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are whitespace
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsWhiteSpace(c) || c == ' ' || c == '\t' || c == '\n' || c == '\r'));
+        }
+
+        [Fact]
+        public void PadChars_WithSpecialCharactersPadOption_PadsWithSpecialCharactersOnly()
+        {
+            // Arrange
+            string input = "word";
+            int targetLength = 20;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.SpecialCharacters);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are special characters
+            string paddingPart = result.Substring(input.Length);
+            string expectedSpecialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
+            Assert.All(paddingPart, c => Assert.Contains(c, expectedSpecialChars));
+        }
+
+        [Fact]
+        public void PadChars_WithNumbersAndLowerCaseAlphabetsCombined_PadsWithDigitsAndLowercaseLetters()
+        {
+            // Arrange
+            string input = "mix";
+            int targetLength = 20;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers | PadOptions.LowerCaseAlphabets);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are either digits or lowercase letters
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsDigit(c) || (char.IsLetter(c) && char.IsLower(c))));
+        }
+
+        [Fact]
+        public void PadChars_WithNumbersAndUpperCaseAlphabetsCombined_PadsWithDigitsAndUppercaseLetters()
+        {
+            // Arrange
+            string input = "TEST";
+            int targetLength = 25;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers | PadOptions.UpperCaseAlphabets);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are either digits or uppercase letters
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsDigit(c) || (char.IsLetter(c) && char.IsUpper(c))));
+        }
+
+        [Fact]
+        public void PadChars_WithBothUpperAndLowerCaseAlphabetsCombined_PadsWithBothCaseLetters()
+        {
+            // Arrange
+            string input = "Case";
+            int targetLength = 30;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.LowerCaseAlphabets | PadOptions.UpperCaseAlphabets);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that all padding characters are letters (both upper and lower case allowed)
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsLetter(c)));
+        }
+
+        [Fact]
+        public void PadChars_WithAllBasicOptionsCombined_PadsWithAllCharacterTypes()
+        {
+            // Arrange
+            string input = "all";
+            int targetLength = 50;
+            var allBasicOptions = PadOptions.Numbers | PadOptions.LowerCaseAlphabets | 
+                                PadOptions.UpperCaseAlphabets | PadOptions.SpecialCharacters;
+
+            // Act
+            string result = input.PadChars(targetLength, allBasicOptions);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // The padding part should contain a mix of different character types
+            string paddingPart = result.Substring(input.Length);
+            Assert.True(paddingPart.Length > 0);
+            
+            // At least verify that valid characters are used (not testing randomness distribution)
+            string expectedSpecialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
+            Assert.All(paddingPart, c => Assert.True(
+                char.IsDigit(c) || 
+                char.IsLetter(c) || 
+                expectedSpecialChars.Contains(c)));
+        }
+
+        [Fact]
+        public void PadChars_WithWhitespaceAndOtherOptionsCombined_IncludesWhitespaceInPadding()
+        {
+            // Arrange
+            string input = "space";
+            int targetLength = 25;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Whitespace | PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Check that padding contains either whitespace or digits
+            string paddingPart = result.Substring(input.Length);
+            Assert.All(paddingPart, c => Assert.True(char.IsDigit(c) || char.IsWhiteSpace(c)));
+        }
+
+        [Fact]
+        public void PadChars_WithEmptyStringInput_PadsEntireResultWithSpecifiedCharacters()
+        {
+            // Arrange
+            string input = "";
+            int targetLength = 10;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.All(result, c => Assert.True(char.IsDigit(c)));
+        }
+
+        [Fact]
+        public void PadChars_WithSingleCharacterInput_PreservesInputAndPadsRemainder()
+        {
+            // Arrange
+            string input = "x";
+            int targetLength = 15;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.LowerCaseAlphabets);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            Assert.Equal('x', result[0]);
+            
+            // Check that remaining characters are lowercase letters
+            for (int i = 1; i < result.Length; i++)
+            {
+                Assert.True(char.IsLower(result[i]) && char.IsLetter(result[i]));
+            }
+        }
+
+        [Fact]
+        public void PadChars_WithZeroTargetLength_ReturnsOriginalString()
+        {
+            // Arrange
+            string input = "test";
+            int targetLength = 0;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(input, result);
+        }
+
+        [Fact]
+        public void PadChars_WithNegativeTargetLength_ReturnsOriginalString()
+        {
+            // Arrange
+            string input = "negative";
+            int targetLength = -5;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(input, result);
+        }
+
+        [Fact]
+        public void PadChars_CallMultipleTimes_ProducesDifferentRandomResults()
+        {
+            // Arrange
+            string input = "rand";
+            int targetLength = 20;
+
+            // Act
+            string result1 = input.PadChars(targetLength, PadOptions.Numbers);
+            string result2 = input.PadChars(targetLength, PadOptions.Numbers);
+            string result3 = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(targetLength, result1.Length);
+            Assert.Equal(targetLength, result2.Length);
+            Assert.Equal(targetLength, result3.Length);
+            
+            // All should start with the same input
+            Assert.All(new[] { result1, result2, result3 }, r => Assert.StartsWith(input, r));
+            
+            // The padding portions should very likely be different due to randomness
+            // Note: There's a tiny chance they could be the same, but it's astronomically small
+            string padding1 = result1.Substring(input.Length);
+            string padding2 = result2.Substring(input.Length);
+            string padding3 = result3.Substring(input.Length);
+            
+            // At least one pair should be different
+            bool anyDifferent = !padding1.Equals(padding2) || !padding2.Equals(padding3) || !padding1.Equals(padding3);
+            Assert.True(anyDifferent, "Multiple calls should produce different random padding");
+        }
+
+        [Fact]
+        public void PadChars_WithVeryLongTargetLength_HandlesLargePaddingSizes()
+        {
+            // Arrange
+            string input = "big";
+            int targetLength = 1000;
+
+            // Act
+            string result = input.PadChars(targetLength, PadOptions.Numbers);
+
+            // Assert
+            Assert.Equal(targetLength, result.Length);
+            Assert.StartsWith(input, result);
+            
+            // Verify all padding characters are digits
+            for (int i = input.Length; i < result.Length; i++)
+            {
+                Assert.True(char.IsDigit(result[i]));
+            }
+        }
+
+        #endregion
     }
 }
